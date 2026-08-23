@@ -1,5 +1,7 @@
+package una.sistemareservas.vista;
 import javax.swing.*;
 import java.awt.*;
+
 
 public class EjemploTabs extends JFrame {
 
