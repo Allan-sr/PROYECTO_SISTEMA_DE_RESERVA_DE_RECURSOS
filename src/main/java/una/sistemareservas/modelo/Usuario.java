@@ -1,9 +1,19 @@
 package una.sistemareservas.modelo;
 
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlSeeAlso;
+
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlSeeAlso({Funcionario.class, Administrador.class})
 public abstract class Usuario {
+
     protected String id;
     protected String clave;
     protected Rol rol;
+
+    public Usuario() {
+    }
 
     public Usuario(String id, String clave, Rol rol) {
         this.id = id;
