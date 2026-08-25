@@ -5,7 +5,7 @@ import una.sistemareservas.vista.LoginView;
 
 import javax.swing.*;
 
-public class main {
+public class Main {
 
     public static void main(String[] args) {
 

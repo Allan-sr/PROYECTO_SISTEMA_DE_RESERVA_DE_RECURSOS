@@ -80,7 +80,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>una.sistemareservas.vista.Main</mainClass>
+                            <mainClass>una.sistemareservas.Main</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
