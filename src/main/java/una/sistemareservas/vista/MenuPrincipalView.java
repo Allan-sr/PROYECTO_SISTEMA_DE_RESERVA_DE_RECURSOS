@@ -196,17 +196,32 @@ public class MenuPrincipalView extends JFrame {
          * pendientes de implementar.
          */
 
-        btnFuncionarios.addActionListener(e ->
-                mostrarPendiente("Funcionarios")
-        );
+        btnFuncionarios.addActionListener(e -> {
 
-        btnCategorias.addActionListener(e ->
-                mostrarPendiente("Categorías")
-        );
+            FuncionariosView vista = new FuncionariosView();
 
-        btnRecursos.addActionListener(e ->
-                mostrarPendiente("Recursos")
-        );
+            new una.sistemareservas.controlador.FuncionariosController(vista);
+
+            vista.setVisible(true);
+        });
+
+        btnCategorias.addActionListener(e -> {
+
+            CategoriasView vista = new CategoriasView();
+
+            new una.sistemareservas.controlador.CategoriasController(vista);
+
+            vista.setVisible(true);
+        });
+
+        btnRecursos.addActionListener(e -> {
+
+            RecursosView vista = new RecursosView();
+
+            new una.sistemareservas.controlador.RecursosController(vista);
+
+            vista.setVisible(true);
+        });
 
         btnReservas.addActionListener(e ->
                 mostrarPendiente("Reservas")

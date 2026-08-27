@@ -99,7 +99,24 @@ public class CategoriaDAO {
     }
 
     private String generarSiguienteId(List<Categoria> categorias) {
-        int siguiente = categorias.size() + 1;
-        return String.format("CAT-%06d", siguiente);
+
+        int maximo = 0;
+
+        for (Categoria categoria : categorias) {
+
+            String id = categoria.getId();
+
+            if (id != null && id.startsWith("CAT-")) {
+
+                try {
+                    int numero = Integer.parseInt(id.substring(4));
+                    maximo = Math.max(maximo, numero);
+                } catch (NumberFormatException ignorado) {
+                    // Id con formato inesperado; se ignora para el cálculo.
+                }
+            }
+        }
+
+        return String.format("CAT-%06d", maximo + 1);
     }
 }
