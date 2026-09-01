@@ -223,9 +223,10 @@ public class MenuPrincipalView extends JFrame {
             vista.setVisible(true);
         });
 
-        btnReservas.addActionListener(e ->
-                mostrarPendiente("Reservas")
-        );
+        btnReservas.addActionListener(e -> {ReservasView vista = new ReservasView();
+            new una.sistemareservas.controlador.ReservaController(vista);
+            vista.setVisible(true);
+        });
 
         btnCalendario.addActionListener(e ->
                 mostrarPendiente("Calendario")
