@@ -28,7 +28,6 @@ public class EstadisticasController {
         this.vista = vista;
         this.reservaService = new ReservaService();
         iniciarEventos();
-        generarReporte(); // Carga el gráfico por defecto al abrir
     }
 
     private void iniciarEventos() {

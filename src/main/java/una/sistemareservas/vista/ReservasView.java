@@ -37,135 +37,1030 @@ public class ReservasView extends JFrame {
     public ReservasView() {
 
         setTitle("Reservas");
-        setSize(780, 650);
+
+        setSize(1100, 700);
+
         setLocationRelativeTo(null);
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+        setDefaultCloseOperation(
+                JFrame.DISPOSE_ON_CLOSE
+        );
 
         inicializarComponentes();
     }
 
+    private static final Color AZUL =
+            new Color(28, 111, 232);
+
+    private static final Color AZUL_OSCURO =
+            new Color(22, 57, 112);
+
+    private static final Color FONDO =
+            new Color(244, 248, 253);
+
+    private static final Color BORDE =
+            new Color(220, 229, 241);
+
+    private static final Color TEXTO =
+            new Color(22, 39, 73);
+
+    private JPanel tarjeta(
+            String titulo,
+            String subtitulo) {
+
+        JPanel tarjeta =
+                new JPanel(
+                        new BorderLayout(
+                                10,
+                                10
+                        )
+                );
+
+        tarjeta.setBackground(
+                Color.WHITE
+        );
+
+        tarjeta.setBorder(
+                BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(
+                                BORDE
+                        ),
+                        BorderFactory.createEmptyBorder(
+                                18,
+                                20,
+                                18,
+                                20
+                        )
+                )
+        );
+
+        JPanel encabezado =
+                new JPanel(
+                        new BorderLayout(
+                                12,
+                                0
+                        )
+                );
+
+        encabezado.setOpaque(false);
+
+        JLabel circulo =
+                new JLabel(
+                        "+",
+                        SwingConstants.CENTER
+                );
+
+        circulo.setPreferredSize(
+                new Dimension(
+                        42,
+                        42
+                )
+        );
+
+        circulo.setFont(
+                new Font(
+                        "Segoe UI",
+                        Font.BOLD,
+                        25
+                )
+        );
+
+        circulo.setForeground(
+                Color.WHITE
+        );
+
+        circulo.setOpaque(true);
+
+        circulo.setBackground(
+                AZUL
+        );
+
+        JPanel textos =
+                new JPanel();
+
+        textos.setOpaque(false);
+
+        textos.setLayout(
+                new BoxLayout(
+                        textos,
+                        BoxLayout.Y_AXIS
+                )
+        );
+
+        JLabel lblTitulo =
+                new JLabel(titulo);
+
+        lblTitulo.setFont(
+                new Font(
+                        "Segoe UI",
+                        Font.BOLD,
+                        20
+                )
+        );
+
+        lblTitulo.setForeground(
+                AZUL_OSCURO
+        );
+
+        JLabel lblSubtitulo =
+                new JLabel(subtitulo);
+
+        lblSubtitulo.setFont(
+                new Font(
+                        "Segoe UI",
+                        Font.PLAIN,
+                        13
+                )
+        );
+
+        lblSubtitulo.setForeground(
+                new Color(
+                        95,
+                        119,
+                        153
+                )
+        );
+
+        textos.add(lblTitulo);
+
+        textos.add(
+                Box.createVerticalStrut(3)
+        );
+
+        textos.add(lblSubtitulo);
+
+        encabezado.add(
+                circulo,
+                BorderLayout.WEST
+        );
+
+        encabezado.add(
+                textos,
+                BorderLayout.CENTER
+        );
+
+        tarjeta.add(
+                encabezado,
+                BorderLayout.NORTH
+        );
+
+        return tarjeta;
+    }
+
     private void inicializarComponentes() {
 
-        JPanel panelPrincipal = new JPanel(new BorderLayout(10, 10));
-        panelPrincipal.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+        JPanel fondo =
+                new JPanel(
+                        new BorderLayout(
+                                0,
+                                14
+                        )
+                );
 
-        JPanel panelSuperior = new JPanel(new BorderLayout(10, 10));
-        panelSuperior.add(construirPanelFrase(), BorderLayout.NORTH);
-        panelSuperior.add(construirPanelFormulario(), BorderLayout.CENTER);
+        fondo.setBackground(FONDO);
 
-        panelPrincipal.add(panelSuperior, BorderLayout.NORTH);
-        panelPrincipal.add(construirPanelListado(), BorderLayout.CENTER);
+        fondo.setBorder(
+                BorderFactory.createEmptyBorder(
+                        5,
+                        5,
+                        5,
+                        5
+                )
+        );
 
-        add(panelPrincipal);
+        /*
+         * ============================================================
+         * NUEVA RESERVA
+         * ============================================================
+         */
+
+        JPanel tarjetaNueva =
+                tarjeta(
+                        "Nueva reserva",
+                        "Completa la información para reservar un recurso"
+                );
+
+        JPanel formulario =
+                new JPanel(
+                        new GridBagLayout()
+                );
+
+        formulario.setOpaque(false);
+
+        GridBagConstraints gbc =
+                new GridBagConstraints();
+
+        gbc.insets =
+                new Insets(
+                        6,
+                        6,
+                        6,
+                        6
+                );
+
+        gbc.fill =
+                GridBagConstraints.HORIZONTAL;
+
+        /*
+         * FRASE
+         */
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 0;
+
+        JLabel lblFrase =
+                crearEtiqueta(
+                        "Frase"
+                );
+
+        formulario.add(
+                lblFrase,
+                gbc
+        );
+
+        txtFrase =
+                new JTextField();
+
+        estilizarCampo(
+                txtFrase
+        );
+
+        gbc.gridx = 1;
+        gbc.weightx = 1;
+
+        formulario.add(
+                txtFrase,
+                gbc
+        );
+
+        btnExtraerIA =
+                crearBotonAzul(
+                        "Extraer"
+                );
+
+        gbc.gridx = 2;
+        gbc.weightx = 0;
+
+        formulario.add(
+                btnExtraerIA,
+                gbc
+        );
+
+        /*
+         * ACTIVIDAD
+         */
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.weightx = 0;
+
+        formulario.add(
+                crearEtiqueta("Actividad"),
+                gbc
+        );
+
+        txtActividad =
+                new JTextField();
+
+        estilizarCampo(
+                txtActividad
+        );
+
+        gbc.gridx = 1;
+        gbc.gridwidth = 2;
+        gbc.weightx = 1;
+
+        formulario.add(
+                txtActividad,
+                gbc
+        );
+
+        gbc.gridwidth = 1;
+
+        /*
+         * FECHA
+         */
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.weightx = 0;
+
+        formulario.add(
+                crearEtiqueta("Fecha"),
+                gbc
+        );
+
+        spnFecha =
+                new JSpinner(
+                        new SpinnerDateModel()
+                );
+
+        spnFecha.setEditor(
+                new JSpinner.DateEditor(
+                        spnFecha,
+                        "dd/MM/yyyy"
+                )
+        );
+
+        estilizarSpinner(
+                spnFecha
+        );
+
+        gbc.gridx = 1;
+        gbc.weightx = 0.5;
+
+        formulario.add(
+                spnFecha,
+                gbc
+        );
+
+        /*
+         * HORA INICIO
+         */
+        gbc.gridx = 2;
+        gbc.weightx = 0;
+
+        formulario.add(
+                crearEtiqueta("Hora inicio"),
+                gbc
+        );
+
+        spnHoraInicio =
+                new JSpinner(
+                        new SpinnerDateModel()
+                );
+
+        spnHoraInicio.setEditor(
+                new JSpinner.DateEditor(
+                        spnHoraInicio,
+                        "HH:mm"
+                )
+        );
+
+        estilizarSpinner(
+                spnHoraInicio
+        );
+
+        gbc.gridx = 3;
+        gbc.weightx = 0.4;
+
+        formulario.add(
+                spnHoraInicio,
+                gbc
+        );
+
+        /*
+         * HORA FIN
+         */
+        gbc.gridx = 2;
+        gbc.gridy = 3;
+        gbc.weightx = 0;
+
+        formulario.add(
+                crearEtiqueta("Hora fin"),
+                gbc
+        );
+
+        spnHoraFin =
+                new JSpinner(
+                        new SpinnerDateModel()
+                );
+
+        spnHoraFin.setEditor(
+                new JSpinner.DateEditor(
+                        spnHoraFin,
+                        "HH:mm"
+                )
+        );
+
+        estilizarSpinner(
+                spnHoraFin
+        );
+
+        gbc.gridx = 3;
+        gbc.weightx = 0.4;
+
+        formulario.add(
+                spnHoraFin,
+                gbc
+        );
+
+        /*
+         * CATEGORÍAS
+         */
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        gbc.weightx = 0;
+
+        formulario.add(
+                crearEtiqueta(
+                        "Categorías requeridas"
+                ),
+                gbc
+        );
+
+        modeloListaCategorias =
+                new DefaultListModel<>();
+
+        listCategorias =
+                new JList<>(
+                        modeloListaCategorias
+                );
+
+        listCategorias.setSelectionMode(
+                ListSelectionModel
+                        .MULTIPLE_INTERVAL_SELECTION
+        );
+
+        listCategorias.setVisibleRowCount(
+                3
+        );
+
+        listCategorias.setFont(
+                new Font(
+                        "Segoe UI",
+                        Font.PLAIN,
+                        13
+                )
+        );
+
+        listCategorias.setFixedCellHeight(
+                34
+        );
+
+        listCategorias.setBackground(
+                Color.WHITE
+        );
+
+        listCategorias.setSelectionBackground(
+                new Color(
+                        218,
+                        234,
+                        255
+                )
+        );
+
+        listCategorias.setSelectionForeground(
+                AZUL_OSCURO
+        );
+
+        listCategorias.setCellRenderer(
+                new DefaultListCellRenderer() {
+
+                    @Override
+                    public Component
+                    getListCellRendererComponent(
+                            JList<?> lista,
+                            Object valor,
+                            int indice,
+                            boolean seleccionado,
+                            boolean enfocado) {
+
+                        JLabel label =
+                                (JLabel)
+                                        super.getListCellRendererComponent(
+                                                lista,
+                                                valor,
+                                                indice,
+                                                seleccionado,
+                                                enfocado
+                                        );
+
+                        label.setBorder(
+                                BorderFactory.createEmptyBorder(
+                                        5,
+                                        8,
+                                        5,
+                                        8
+                                )
+                        );
+
+                        if (seleccionado) {
+
+                            label.setFont(
+                                    new Font(
+                                            "Segoe UI",
+                                            Font.BOLD,
+                                            13
+                                    )
+                            );
+                        }
+
+                        return label;
+                    }
+                }
+        );
+
+        JScrollPane scrollCategorias =
+                new JScrollPane(
+                        listCategorias
+                );
+
+        scrollCategorias.setBorder(
+                BorderFactory.createLineBorder(
+                        BORDE
+                )
+        );
+
+        gbc.gridx = 1;
+        gbc.gridy = 3;
+        gbc.gridwidth = 1;
+        gbc.weightx = 1;
+        gbc.weighty = 1;
+
+        formulario.add(
+                scrollCategorias,
+                gbc
+        );
+
+        /*
+         * BOTONES
+         */
+        JPanel botones =
+                new JPanel(
+                        new FlowLayout(
+                                FlowLayout.RIGHT,
+                                10,
+                                4
+                        )
+                );
+
+        botones.setOpaque(false);
+
+        btnReservar =
+                crearBotonAzul(
+                        "Reservar"
+                );
+
+        btnCancelar =
+                crearBotonSecundario(
+                        "Cancelar reserva seleccionada"
+                );
+
+        btnLimpiar =
+                crearBotonRojo(
+                        "Limpiar"
+                );
+
+        botones.add(
+                btnReservar
+        );
+
+        botones.add(
+                btnCancelar
+        );
+
+        botones.add(
+                btnLimpiar
+        );
+
+        JPanel contenidoNueva =
+                new JPanel(
+                        new BorderLayout(
+                                0,
+                                10
+                        )
+                );
+
+        contenidoNueva.setOpaque(false);
+
+        contenidoNueva.add(
+                formulario,
+                BorderLayout.CENTER
+        );
+
+        contenidoNueva.add(
+                botones,
+                BorderLayout.SOUTH
+        );
+
+        tarjetaNueva.add(
+                contenidoNueva,
+                BorderLayout.CENTER
+        );
+
+        /*
+         * ============================================================
+         * MIS RESERVAS
+         * ============================================================
+         */
+
+        JPanel tarjetaReservas =
+                tarjeta(
+                        "Mis reservas",
+                        "Consulta, revisa o imprime tus reservas"
+                );
+
+        modeloTabla =
+                new DefaultTableModel(
+                        new Object[]{
+                                "ID",
+                                "Actividad",
+                                "Fecha",
+                                "Horario",
+                                "Recursos",
+                                "Estado"
+                        },
+                        0
+                ) {
+
+                    @Override
+                    public boolean isCellEditable(
+                            int fila,
+                            int columna) {
+
+                        return false;
+                    }
+                };
+
+        tabla =
+                new JTable(
+                        modeloTabla
+                );
+
+        tabla.setFont(
+                new Font(
+                        "Segoe UI",
+                        Font.PLAIN,
+                        13
+                )
+        );
+
+        tabla.getTableHeader()
+                .setFont(
+                        new Font(
+                                "Segoe UI",
+                                Font.BOLD,
+                                13
+                        )
+                );
+
+        tabla.getTableHeader()
+                .setBackground(
+                        new Color(
+                                239,
+                                246,
+                                255
+                        )
+                );
+
+        tabla.getTableHeader()
+                .setForeground(
+                        AZUL_OSCURO
+                );
+
+        tabla.setRowHeight(32);
+
+        tabla.setSelectionMode(
+                ListSelectionModel
+                        .SINGLE_SELECTION
+        );
+
+        tabla.setSelectionBackground(
+                new Color(
+                        218,
+                        234,
+                        255
+                )
+        );
+
+        tabla.setShowVerticalLines(
+                false
+        );
+
+        tabla.setGridColor(
+                BORDE
+        );
+
+        JScrollPane scroll =
+                new JScrollPane(
+                        tabla
+                );
+
+        scroll.setBorder(
+                BorderFactory.createLineBorder(
+                        BORDE
+                )
+        );
+
+        tarjetaReservas.add(
+                scroll,
+                BorderLayout.CENTER
+        );
+
+        JPanel botonImprimir =
+                new JPanel(
+                        new FlowLayout(
+                                FlowLayout.RIGHT,
+                                0,
+                                8
+                        )
+                );
+
+        botonImprimir.setOpaque(false);
+
+        btnImprimir =
+                crearBotonSecundario(
+                        "Imprimir"
+                );
+
+        botonImprimir.add(
+                btnImprimir
+        );
+
+        tarjetaReservas.add(
+                botonImprimir,
+                BorderLayout.SOUTH
+        );
+
+        /*
+         * ============================================================
+         * PANTALLA FINAL
+         * ============================================================
+         */
+
+        JPanel contenido =
+                new JPanel(
+                        new BorderLayout(
+                                0,
+                                14
+                        )
+                );
+
+        contenido.setOpaque(false);
+
+        contenido.add(
+                tarjetaNueva,
+                BorderLayout.NORTH
+        );
+
+        contenido.add(
+                tarjetaReservas,
+                BorderLayout.CENTER
+        );
+
+        fondo.add(
+                contenido,
+                BorderLayout.CENTER
+        );
+
+        add(fondo);
     }
 
-    private JPanel construirPanelFrase() {
+    private JLabel crearEtiqueta(
+            String texto) {
 
-        JPanel panel = new JPanel(new BorderLayout(10, 5));
-        panel.setBorder(BorderFactory.createTitledBorder("Llenar usando Inteligencia Artificial (opcional)"));
+        JLabel label =
+                new JLabel(texto);
 
-        panel.add(new JLabel("Frase:"), BorderLayout.WEST);
+        label.setFont(
+                new Font(
+                        "Segoe UI",
+                        Font.BOLD,
+                        13
+                )
+        );
 
-        txtFrase = new JTextField();
-        panel.add(txtFrase, BorderLayout.CENTER);
+        label.setForeground(
+                TEXTO
+        );
 
-        btnExtraerIA = new JButton("Extraer");
-        panel.add(btnExtraerIA, BorderLayout.EAST);
-
-        return panel;
+        return label;
     }
 
-    private JPanel construirPanelFormulario() {
+    private void estilizarCampo(
+            JTextField campo) {
 
-        JPanel panelExterno = new JPanel(new BorderLayout());
+        campo.setFont(
+                new Font(
+                        "Segoe UI",
+                        Font.PLAIN,
+                        14
+                )
+        );
 
-        JPanel panel = new JPanel(new GridLayout(2, 4, 10, 10));
-        panel.setBorder(BorderFactory.createTitledBorder("Nueva reserva"));
+        campo.setPreferredSize(
+                new Dimension(
+                        250,
+                        38
+                )
+        );
 
-        panel.add(new JLabel("Actividad:"));
-        txtActividad = new JTextField();
-        panel.add(txtActividad);
-
-        panel.add(new JLabel("Fecha:"));
-        spnFecha = new JSpinner(new SpinnerDateModel());
-        spnFecha.setEditor(new JSpinner.DateEditor(spnFecha, "dd/MM/yyyy"));
-        panel.add(spnFecha);
-
-        panel.add(new JLabel("Hora inicio:"));
-        spnHoraInicio = new JSpinner(new SpinnerDateModel());
-        spnHoraInicio.setEditor(new JSpinner.DateEditor(spnHoraInicio, "HH:mm"));
-        panel.add(spnHoraInicio);
-
-        panel.add(new JLabel("Hora fin:"));
-        spnHoraFin = new JSpinner(new SpinnerDateModel());
-        spnHoraFin.setEditor(new JSpinner.DateEditor(spnHoraFin, "HH:mm"));
-        panel.add(spnHoraFin);
-
-        panelExterno.add(panel, BorderLayout.NORTH);
-
-        JPanel panelCategorias = new JPanel(new BorderLayout());
-        panelCategorias.setBorder(BorderFactory.createTitledBorder("Categorías requeridas (selección múltiple)"));
-
-        modeloListaCategorias = new DefaultListModel<>();
-        listCategorias = new JList<>(modeloListaCategorias);
-        listCategorias.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-        listCategorias.setVisibleRowCount(4);
-
-        JScrollPane scrollCategorias = new JScrollPane(listCategorias);
-        panelCategorias.add(scrollCategorias, BorderLayout.CENTER);
-
-        panelExterno.add(panelCategorias, BorderLayout.CENTER);
-
-        JPanel panelBotones = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 10));
-
-        btnReservar = new JButton("Reservar");
-        btnCancelar = new JButton("Cancelar reserva seleccionada");
-        btnLimpiar = new JButton("Limpiar");
-
-        panelBotones.add(btnReservar);
-        panelBotones.add(btnCancelar);
-        panelBotones.add(btnLimpiar);
-
-        panelExterno.add(panelBotones, BorderLayout.SOUTH);
-
-        return panelExterno;
+        campo.setBorder(
+                BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(
+                                BORDE
+                        ),
+                        BorderFactory.createEmptyBorder(
+                                6,
+                                10,
+                                6,
+                                10
+                        )
+                )
+        );
     }
 
-    private JPanel construirPanelListado() {
+    private void estilizarSpinner(
+            JSpinner spinner) {
 
-        JPanel panel = new JPanel(new BorderLayout(5, 5));
-        panel.setBorder(BorderFactory.createTitledBorder("Mis reservas"));
+        spinner.setPreferredSize(
+                new Dimension(
+                        180,
+                        38
+                )
+        );
 
-        modeloTabla = new DefaultTableModel(
-                new Object[]{"Id", "Actividad", "Fecha", "Horario", "Recursos", "Estado"}, 0) {
+        JComponent editor =
+                spinner.getEditor();
 
-            @Override
-            public boolean isCellEditable(int fila, int columna) {
-                return false;
-            }
-        };
+        if (editor instanceof JSpinner.DefaultEditor) {
 
-        tabla = new JTable(modeloTabla);
-        tabla.setRowHeight(22);
-        tabla.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+            JTextField campo =
+                    ((JSpinner.DefaultEditor)
+                            editor)
+                            .getTextField();
 
-        JScrollPane scroll = new JScrollPane(tabla);
-        scroll.setPreferredSize(new Dimension(700, 180));
+            campo.setFont(
+                    new Font(
+                            "Segoe UI",
+                            Font.PLAIN,
+                            14
+                    )
+            );
 
-        panel.add(scroll, BorderLayout.CENTER);
+            campo.setBorder(
+                    BorderFactory.createEmptyBorder(
+                            5,
+                            8,
+                            5,
+                            8
+                    )
+            );
+        }
 
-        JPanel panelBoton = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        btnImprimir = new JButton("Imprimir");
-        panelBoton.add(btnImprimir);
-
-        panel.add(panelBoton, BorderLayout.SOUTH);
-
-        return panel;
+        spinner.setBorder(
+                BorderFactory.createLineBorder(
+                        BORDE
+                )
+        );
     }
 
-    /**
-     * Llena la lista de categorías disponibles para seleccionar en la reserva.
-     */
+    private JButton crearBotonAzul(
+            String texto) {
+
+        JButton boton =
+                new JButton(texto);
+
+        boton.setFont(
+                new Font(
+                        "Segoe UI",
+                        Font.BOLD,
+                        13
+                )
+        );
+
+        boton.setForeground(
+                Color.WHITE
+        );
+
+        boton.setBackground(
+                AZUL
+        );
+
+        boton.setFocusPainted(false);
+
+        boton.setCursor(
+                new Cursor(
+                        Cursor.HAND_CURSOR
+                )
+        );
+
+        boton.setBorder(
+                BorderFactory.createEmptyBorder(
+                        10,
+                        22,
+                        10,
+                        22
+                )
+        );
+
+        return boton;
+    }
+
+    private JButton crearBotonSecundario(
+            String texto) {
+
+        JButton boton =
+                new JButton(texto);
+
+        boton.setFont(
+                new Font(
+                        "Segoe UI",
+                        Font.BOLD,
+                        12
+                )
+        );
+
+        boton.setForeground(
+                AZUL_OSCURO
+        );
+
+        boton.setBackground(
+                new Color(
+                        239,
+                        246,
+                        255
+                )
+        );
+
+        boton.setFocusPainted(false);
+
+        boton.setCursor(
+                new Cursor(
+                        Cursor.HAND_CURSOR
+                )
+        );
+
+        boton.setBorder(
+                BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(
+                                new Color(
+                                        190,
+                                        213,
+                                        244
+                                )
+                        ),
+                        BorderFactory.createEmptyBorder(
+                                9,
+                                14,
+                                9,
+                                14
+                        )
+                )
+        );
+
+        return boton;
+    }
+
+    private JButton crearBotonRojo(
+            String texto) {
+
+        JButton boton =
+                new JButton(texto);
+
+        boton.setFont(
+                new Font(
+                        "Segoe UI",
+                        Font.BOLD,
+                        12
+                )
+        );
+
+        boton.setForeground(
+                new Color(
+                        190,
+                        35,
+                        35
+                )
+        );
+
+        boton.setBackground(
+                new Color(
+                        255,
+                        244,
+                        244
+                )
+        );
+
+        boton.setFocusPainted(false);
+
+        boton.setCursor(
+                new Cursor(
+                        Cursor.HAND_CURSOR
+                )
+        );
+
+        boton.setBorder(
+                BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(
+                                new Color(
+                                        245,
+                                        170,
+                                        170
+                                )
+                        ),
+                        BorderFactory.createEmptyBorder(
+                                9,
+                                14,
+                                9,
+                                14
+                        )
+                )
+        );
+
+        return boton;
+    }
+
+
     public void cargarCategorias(List<Categoria> categorias) {
         DefaultListModel<Categoria> model = new DefaultListModel<>();
         if (categorias != null) {
