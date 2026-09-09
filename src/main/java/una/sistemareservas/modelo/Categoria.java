@@ -36,6 +36,6 @@ public class Categoria {
 
     @Override
     public String toString() {
-        return descripcion;
+        return this.descripcion; // Muestra la descripción en el JList
     }
 }

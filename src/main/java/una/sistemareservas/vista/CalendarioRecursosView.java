@@ -1,169 +1,110 @@
 package una.sistemareservas.vista;
 
-import una.sistemareservas.modelo.Categoria;
-import una.sistemareservas.modelo.Recurso;
-import una.sistemareservas.modelo.Reserva;
-
 import javax.swing.*;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.List;
+import java.time.ZoneId;
+import java.util.Date;
 
 public class CalendarioRecursosView extends JFrame {
-    private JComboBox<Categoria> cmbCategoria;
-    private JSpinner spnFecha;
-    private JButton btnConsultar;
-    private JTable tabla;
-    private DefaultTableModel modeloTabla;
+
+    private JSpinner spinnerFechaRef;
+    private JButton btnAnterior;
+    private JButton btnSiguiente;
+    private JButton btnHoy;
+    private JLabel lblRangoSemana;
+    private JTable tablaCalendario;
+    private DefaultTableModel modelTabla;
 
     public CalendarioRecursosView() {
-        setTitle("Calendario de Recursos");
-        setSize(1100, 600);
+        setTitle("Programación Semanal de Actividades");
+        setSize(1000, 650);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        inicializarComponentes();
+        initComponents();
     }
 
-    private void inicializarComponentes() {
+    private void initComponents() {
+        setLayout(new BorderLayout(10, 10));
 
-        JPanel panelPrincipal = new JPanel(new BorderLayout(10, 10));
-        panelPrincipal.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
-        panelPrincipal.add(construirPanelFiltro(), BorderLayout.NORTH);
-        panelPrincipal.add(construirPanelCalendario(), BorderLayout.CENTER);
-        add(panelPrincipal);
-    }
+        // Panel Superior: Control de Navegación de Semanas
+        JPanel panelNavegacion = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 10));
+        panelNavegacion.setBorder(BorderFactory.createTitledBorder("Navegación de Semana"));
 
-    private JPanel construirPanelFiltro() {
-        JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
-        panel.setBorder(BorderFactory.createTitledBorder("Consulta"));
-        panel.add(new JLabel("Categoría:"));
+        btnAnterior = new JButton("<< Semana Anterior");
+        btnHoy = new JButton("Hoy");
+        btnSiguiente = new JButton("Semana Siguiente >>");
 
-        cmbCategoria = new JComboBox<>();
-        cmbCategoria.setPreferredSize(new Dimension(200, 25));
-        panel.add(cmbCategoria);
+        panelNavegacion.add(btnAnterior);
+        panelNavegacion.add(btnHoy);
+        panelNavegacion.add(btnSiguiente);
 
-        panel.add(new JLabel("Fecha:"));
-        SpinnerDateModel modeloFecha = new SpinnerDateModel();
-        spnFecha = new JSpinner(modeloFecha);
-        JSpinner.DateEditor editor = new JSpinner.DateEditor(spnFecha, "dd/MM/yyyy");
-        spnFecha.setEditor(editor);
-        spnFecha.setPreferredSize(new Dimension(110, 25));
-        panel.add(spnFecha);
+        panelNavegacion.add(new JLabel("Fecha Ref:"));
+        spinnerFechaRef = crearSpinnerFecha(LocalDate.now());
+        panelNavegacion.add(spinnerFechaRef);
 
-        btnConsultar = new JButton("Consultar");
-        panel.add(btnConsultar);
-        return panel;
-    }
+        lblRangoSemana = new JLabel("", SwingConstants.CENTER);
+        lblRangoSemana.setFont(new Font("Arial", Font.BOLD, 14));
 
-    private JPanel construirPanelCalendario() {
+        JPanel panelNorte = new JPanel(new BorderLayout());
+        panelNorte.add(panelNavegacion, BorderLayout.NORTH);
+        panelNorte.add(lblRangoSemana, BorderLayout.SOUTH);
 
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.setBorder(BorderFactory.createTitledBorder("Disponibilidad de Recursos"));
-        String[] columnas = new String[25];
-        columnas[0] = "Recurso";
-        for (int i = 0; i < 24; i++) {
-            columnas[i + 1] = String.format("%02d:00", i);
-        }
-        modeloTabla = new DefaultTableModel(columnas, 0) {
+        add(panelNorte, BorderLayout.NORTH);
+
+        // Tabla de Calendario (Horas vs Días)
+        String[] columnas = {"Hora", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"};
+        modelTabla = new DefaultTableModel(columnas, 0) {
             @Override
-            public boolean isCellEditable(int fila, int columna) {
-                return false;
+            public boolean isCellEditable(int row, int column) {
+                return false; // Deshabilitar edición directa de celdas
             }
         };
 
-        tabla = new JTable(modeloTabla);
-        tabla.setRowHeight(35);
-        tabla.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-        tabla.getColumnModel().getColumn(0).setPreferredWidth(180);
+        tablaCalendario = new JTable(modelTabla);
+        tablaCalendario.setRowHeight(40);
+        tablaCalendario.getTableHeader().setReorderingAllowed(false);
+        tablaCalendario.setFont(new Font("Arial", Font.PLAIN, 12));
 
-        for (int i = 1; i < 25; i++) {
-            tabla.getColumnModel().getColumn(i).setPreferredWidth(65);
-        }
-        tabla.setDefaultRenderer(Object.class, new CalendarioCellRenderer()
-        );
-
-        JScrollPane scroll = new JScrollPane(tabla);
-        panel.add(scroll, BorderLayout.CENTER);
-        return panel;
+        JScrollPane scrollPane = new JScrollPane(tablaCalendario);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        add(scrollPane, BorderLayout.CENTER);
     }
 
-    public void cargarCategorias(List<Categoria> categorias) {
-        cmbCategoria.removeAllItems();
-        for (Categoria categoria : categorias) {
-            cmbCategoria.addItem(categoria);
-        }
+    private JSpinner crearSpinnerFecha(LocalDate fecha) {
+        Date date = Date.from(fecha.atStartOfDay(ZoneId.systemDefault()).toInstant());
+        SpinnerDateModel model = new SpinnerDateModel(date, null, null, java.util.Calendar.DAY_OF_MONTH);
+        JSpinner spinner = new JSpinner(model);
+        JSpinner.DateEditor editor = new JSpinner.DateEditor(spinner, "dd/MM/yyyy");
+        spinner.setEditor(editor);
+        return spinner;
     }
 
-    public String getCategoriaId() {
-        Categoria seleccionada = (Categoria) cmbCategoria.getSelectedItem();
-        if (seleccionada == null) {
-            return "";
-        }
-        return seleccionada.getId();
+    public LocalDate getFechaSeleccionada() {
+        Date date = (Date) spinnerFechaRef.getValue();
+        return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
     }
 
-    public LocalDate getFecha() {
-        java.util.Date fecha = (java.util.Date) spnFecha.getValue();
-        return fecha.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate();
+    public void setFechaSeleccionada(LocalDate fecha) {
+        Date date = Date.from(fecha.atStartOfDay(ZoneId.systemDefault()).toInstant());
+        spinnerFechaRef.setValue(date);
     }
 
-    public JButton getBtnConsultar() {
-        return btnConsultar;
+    public void setRangoSemanaTexto(String texto) {
+        lblRangoSemana.setText(texto);
     }
 
-    public JTable getTabla() {
-        return tabla;
+    public DefaultTableModel getModelTabla() {
+        return modelTabla;
     }
 
-    public void limpiarTabla() {
-
-        modeloTabla.setRowCount(0);
+    public JTable getTablaCalendario() {
+        return tablaCalendario;
     }
 
-    public void cargarCalendario(List<Recurso> recursos, List<LocalTime> horas, List<Reserva> reservas) {
-        modeloTabla.setRowCount(0);
-        for (Recurso recurso : recursos) {
-            Object[] fila = new Object[horas.size() + 1]; fila[0] = recurso.getDescripcion();
-            for (int i = 0; i < horas.size(); i++) {
-                LocalTime hora = horas.get(i);
-                boolean ocupado = false; for (Reserva reserva : reservas) {
-                    if (reserva.getRecursoIds() .contains(recurso.getId())) {
-                        if (!hora.isBefore(reserva.getHoraInicio()) && hora.isBefore(reserva.getHoraFin())) {
-                            ocupado = true; break;
-                        }
-                    }
-                }
-                fila[i + 1] = ocupado ? "Ocupado" : "Disponible";
-            } modeloTabla.addRow(fila);
-        }
-    }
-
-    public void mostrarMensaje(String mensaje) {
-        JOptionPane.showMessageDialog(this, mensaje, "Calendario de Recursos", JOptionPane.INFORMATION_MESSAGE);
-    }
-
-    public void mostrarError(String mensaje) {
-        JOptionPane.showMessageDialog(this, mensaje, "Error", JOptionPane.ERROR_MESSAGE);
-    }
-
-    private static class CalendarioCellRenderer extends DefaultTableCellRenderer {
-
-        @Override
-        public Component getTableCellRendererComponent(JTable tabla, Object valor, boolean seleccionado, boolean tieneFoco, int fila, int columna) {
-            Component componente = super.getTableCellRendererComponent(tabla, valor, seleccionado, tieneFoco, fila, columna);
-            setHorizontalAlignment(SwingConstants.CENTER);
-            if (columna == 0) {
-                setHorizontalAlignment(SwingConstants.LEFT);
-            } else if ("Ocupado".equals(valor)) {
-                setToolTipText("Recurso reservado");
-            } else if ("Disponible".equals(valor)) {
-                setToolTipText("Recurso disponible");
-            }
-            return componente;
-        }
-    }
+    public JButton getBtnAnterior() { return btnAnterior; }
+    public JButton getBtnSiguiente() { return btnSiguiente; }
+    public JButton getBtnHoy() { return btnHoy; }
+    public JSpinner getSpinnerFechaRef() { return spinnerFechaRef; }
 }
-

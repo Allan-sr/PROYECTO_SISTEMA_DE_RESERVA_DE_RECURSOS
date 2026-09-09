@@ -61,6 +61,12 @@ public class ReservaService {
         return resultado;
     }
 
+    /**
+     * Lista todas las reservas del sistema sin filtrar por funcionario.
+     */
+    public List<Reserva> listar() {
+        return reservaDAO.cargar();
+    }
 
     public ResultadoReserva crear(String actividad, LocalDate fecha, LocalTime horaInicio, LocalTime horaFin, List<String> categoriaIds) {
 

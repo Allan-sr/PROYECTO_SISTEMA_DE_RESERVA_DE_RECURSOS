@@ -34,3 +34,16 @@ usuarios.xml
 categorias.xml
 recursos.xml
 reservas.xml
+
+# Excluir llaves y configuraciones privadas
+config.properties
+
+# Excluir carpeta de compilacion de Maven
+target/
+
+# Excluir configuraciones de la IDE (IntelliJ)
+.idea/
+*.iml
+
+# Excluir comprobantes PDF generados
+*.pdf

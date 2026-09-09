@@ -228,17 +228,22 @@ public class MenuPrincipalView extends JFrame {
             vista.setVisible(true);
         });
 
-        btnCalendario.addActionListener(e ->
-                mostrarPendiente("Calendario")
-        );
+        btnCalendario.addActionListener(e -> {
+            CalendarioRecursosView vista = new CalendarioRecursosView();
+            new una.sistemareservas.controlador.CalendarioRecursosController(vista);
+            vista.setVisible(true);
+        });
 
-        btnActividades.addActionListener(e ->
-                mostrarPendiente("Programación de actividades")
-        );
-
-        btnEstadisticas.addActionListener(e ->
-                mostrarPendiente("Estadísticas")
-        );
+        btnActividades.addActionListener(e -> {
+            CalendarioRecursosView vista = new CalendarioRecursosView();
+            new una.sistemareservas.controlador.CalendarioRecursosController(vista);
+            vista.setVisible(true);
+        });
+        btnEstadisticas.addActionListener(e -> {
+            EstadisticasView vista = new EstadisticasView();
+            new una.sistemareservas.controlador.EstadisticasController(vista);
+            vista.setVisible(true);
+        });
     }
 
     private void mostrarPendiente(String funcionalidad) {

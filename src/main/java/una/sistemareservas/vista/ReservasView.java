@@ -167,12 +167,13 @@ public class ReservasView extends JFrame {
      * Llena la lista de categorías disponibles para seleccionar en la reserva.
      */
     public void cargarCategorias(List<Categoria> categorias) {
-
-        modeloListaCategorias.clear();
-
-        for (Categoria categoria : categorias) {
-            modeloListaCategorias.addElement(categoria);
+        DefaultListModel<Categoria> model = new DefaultListModel<>();
+        if (categorias != null) {
+            for (Categoria cat : categorias) {
+                model.addElement(cat);
+            }
         }
+        this.listCategorias.setModel(model); // Cambia 'listCategorias' por el nombre de tu JList
     }
 
     public void cargarTabla(List<Reserva> reservas) {
@@ -274,14 +275,6 @@ public class ReservasView extends JFrame {
         return (valor == null) ? "" : valor.toString();
     }
 
-    public JTextField getTxtFrase() {
-        return txtFrase;
-    }
-
-    public JButton getBtnExtraerIA() {
-        return btnExtraerIA;
-    }
-
     public JButton getBtnReservar() {
         return btnReservar;
     }
@@ -347,5 +340,42 @@ public class ReservasView extends JFrame {
         );
 
         return opcion == JOptionPane.YES_OPTION;
+    }
+
+    public JTextField getTxtFrase() {
+        return txtFrase;
+    }
+
+    public JButton getBtnExtraerIA() {
+        return btnExtraerIA;
+    }
+
+    // Métodos para llenar los campos del formulario con el resultado de la IA
+    public void setTxtActividad(String actividad) {
+        txtActividad.setText(actividad); // Cambia txtActividad según el nombre exacto de tu campo
+    }
+
+    public void seleccionarCategoriasPorNombre(List<String> nombresCategorias) {
+        if (nombresCategorias == null || listCategorias == null) return;
+
+        ListModel<Categoria> model = listCategorias.getModel();
+        int[] indicesToSelect = new int[model.getSize()];
+        int count = 0;
+
+        for (int i = 0; i < model.getSize(); i++) {
+            Categoria cat = model.getElementAt(i);
+            for (String nombreBuscado : nombresCategorias) {
+                // Comparación que ignora mayúsculas y espacios
+                if (cat.getDescripcion().trim().equalsIgnoreCase(nombreBuscado.trim())) {
+                    indicesToSelect[count++] = i;
+                    break;
+                }
+            }
+        }
+        listCategorias.setSelectedIndices(java.util.Arrays.copyOf(indicesToSelect, count));
+    }
+
+    public JTable getTablaReservas() {
+        return tabla;
     }
 }
