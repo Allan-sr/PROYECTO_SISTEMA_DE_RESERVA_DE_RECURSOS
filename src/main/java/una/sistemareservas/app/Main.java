@@ -1,4 +1,4 @@
-package una.sistemareservas;
+package una.sistemareservas.app;
 
 import una.sistemareservas.controlador.LoginController;
 import una.sistemareservas.util.DatosIniciales;

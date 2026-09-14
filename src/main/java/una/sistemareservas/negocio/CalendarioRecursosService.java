@@ -30,52 +30,99 @@ public class CalendarioRecursosService {
     }
 
     public List<Recurso> listarRecursosPorCategoria(String categoriaId) {
-        List<Recurso> resultado = new ArrayList<>();
-        if (categoriaId == null || categoriaId.trim().isEmpty()) {
+
+        List<Recurso> resultado =
+                new ArrayList<>();
+
+        if (categoriaId == null ||
+                categoriaId.trim().isEmpty()) {
+
             return resultado;
         }
 
-        for (Recurso recurso : recursoDAO.cargar()) {
-            if (recurso.getCategoriaId() != null && recurso.getCategoriaId().equalsIgnoreCase(categoriaId)) {
+        for (Recurso recurso :
+                recursoDAO.cargar()) {
+
+            if (recurso.getCategoriaId() != null &&
+                    recurso.getCategoriaId()
+                            .equalsIgnoreCase(categoriaId)) {
+
                 resultado.add(recurso);
             }
         }
+
         return resultado;
     }
 
-    public List<Reserva> listarReservasPorFecha(LocalDate fecha) {
-        List<Reserva> resultado = new ArrayList<>();
+    public List<Reserva> listarReservasPorFecha(
+            LocalDate fecha) {
+
+        List<Reserva> resultado =
+                new ArrayList<>();
+
         if (fecha == null) {
             return resultado;
         }
 
-        for (Reserva reserva : reservaDAO.cargar()) {
-            if (reserva.getEstado() == EstadoReserva.ACTIVA && reserva.getFecha() != null && reserva.getFecha().equals(fecha)) {
+        for (Reserva reserva :
+                reservaDAO.cargar()) {
+
+            if (reserva.getEstado() ==
+                    EstadoReserva.ACTIVA &&
+                    reserva.getFecha() != null &&
+                    reserva.getFecha().equals(fecha)) {
+
                 resultado.add(reserva);
             }
         }
+
         return resultado;
     }
 
-    public Reserva obtenerReservaDelRecurso(Recurso recurso, LocalDate fecha, LocalTime hora) {
-        if (recurso == null || fecha == null || hora == null) {
+    public Reserva obtenerReservaDelRecurso(
+            Recurso recurso,
+            LocalDate fecha,
+            LocalTime hora) {
+
+        if (recurso == null ||
+                fecha == null ||
+                hora == null) {
+
             return null;
         }
-        List<Reserva> reservas = listarReservasPorFecha(fecha);
+
+        List<Reserva> reservas =
+                listarReservasPorFecha(fecha);
+
         for (Reserva reserva : reservas) {
-            if (!reserva.getRecursoIds().contains(recurso.getId())) {
+
+            if (!reserva.getRecursoIds()
+                    .contains(recurso.getId())) {
+
                 continue;
             }
-            if (horaEstaDentroDeReserva(reserva, hora)) {
+
+            if (horaEstaDentroDeReserva(
+                    reserva,
+                    hora)) {
+
                 return reserva;
             }
         }
+
         return null;
     }
 
-    private boolean horaEstaDentroDeReserva(Reserva reserva, LocalTime hora) {
-        return !hora.isBefore(reserva.getHoraInicio())
-                && hora.isBefore(reserva.getHoraFin());
+    private boolean horaEstaDentroDeReserva(
+            Reserva reserva,
+            LocalTime hora) {
+
+        return !hora.isBefore(
+                reserva.getHoraInicio()
+        )
+                && hora.isBefore(
+                reserva.getHoraFin()
+        );
     }
 
     public List<LocalTime> obtenerHorasDelDia() {

@@ -106,7 +106,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>una.sistemareservas.Main</mainClass>
+                            <mainClass>una.sistemareservas.app.Main</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

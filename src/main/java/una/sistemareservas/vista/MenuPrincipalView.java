@@ -31,100 +31,35 @@ public class MenuPrincipalView extends JFrame {
     public MenuPrincipalView() {
 
         Usuario usuario = Sesion.getUsuarioActual();
-
-        setTitle(
-                "Sistema de Reservas - " +
-                        usuario.getId()
-        );
-
+        setTitle("Sistema de Reservas - " + usuario.getId());
         setSize(1220, 760);
-
-        setMinimumSize(
-                new Dimension(1050, 680)
-        );
-
+        setMinimumSize(new Dimension(1050, 680));
         setLocationRelativeTo(null);
-
-        setDefaultCloseOperation(
-                JFrame.EXIT_ON_CLOSE
-        );
-
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         configurarLookVisual();
-
         inicializarComponentes();
-
         configurarEventos();
     }
 
     private void configurarLookVisual() {
 
-        getContentPane()
-                .setBackground(FONDO);
-
-        UIManager.put(
-                "TabbedPane.selected",
-                Color.WHITE
-        );
-
-        UIManager.put(
-                "Table.selectionBackground",
-                new Color(214, 231, 252)
-        );
-
-        UIManager.put(
-                "Table.selectionForeground",
-                TEXTO
-        );
-
-        UIManager.put(
-                "Table.gridColor",
-                BORDE
-        );
-
-        UIManager.put(
-                "Table.background",
-                Color.WHITE
-        );
-
-        UIManager.put(
-                "Table.foreground",
-                TEXTO
-        );
-
-        UIManager.put(
-                "TextField.background",
-                Color.WHITE
-        );
-
-        UIManager.put(
-                "ComboBox.background",
-                Color.WHITE
-        );
+        getContentPane().setBackground(FONDO);
+        UIManager.put("TabbedPane.selected", Color.WHITE);
+        UIManager.put("Table.selectionBackground", new Color(214, 231, 252));
+        UIManager.put("Table.selectionForeground", TEXTO);
+        UIManager.put("Table.gridColor", BORDE);
+        UIManager.put("Table.background", Color.WHITE);
+        UIManager.put("Table.foreground", TEXTO);
+        UIManager.put("TextField.background", Color.WHITE);
+        UIManager.put("ComboBox.background", Color.WHITE);
     }
 
     private void inicializarComponentes() {
-
-        Usuario usuario =
-                Sesion.getUsuarioActual();
-
-        JPanel raiz =
-                new JPanel(
-                        new BorderLayout()
-                );
-
+        Usuario usuario = Sesion.getUsuarioActual();
+        JPanel raiz = new JPanel(new BorderLayout());
         raiz.setBackground(FONDO);
-
-        raiz.setBorder(
-                new EmptyBorder(
-                        16,
-                        18,
-                        16,
-                        18
-                )
-        );
-
-        raiz.add(
-                construirEncabezado(usuario),
+        raiz.setBorder(new EmptyBorder(16, 18, 16, 18));
+        raiz.add(construirEncabezado(usuario),
                 BorderLayout.NORTH
         );
 
@@ -163,19 +98,10 @@ public class MenuPrincipalView extends JFrame {
         /*
          * FUNCIONARIO
          */
-        if (usuario.getRol() ==
-                Rol.FUNCIONARIO) {
-
+        if (usuario.getRol() == Rol.FUNCIONARIO) {
             agregarReservas();
-
-            agregarCalendario(
-                    "Calendario"
-            );
-
-            agregarCalendario(
-                    "Actividades"
-            );
-
+            agregarCalendarioRecursos();
+            agregarCalendarioActividades();
             agregarEstadisticas();
         }
 
@@ -183,21 +109,11 @@ public class MenuPrincipalView extends JFrame {
          * ADMINISTRADOR
          */
         else {
-
             agregarFuncionarios();
-
             agregarCategorias();
-
             agregarRecursos();
-
-            agregarCalendario(
-                    "Calendario"
-            );
-
-            agregarCalendario(
-                    "Actividades"
-            );
-
+            agregarCalendarioRecursos();
+            agregarCalendarioActividades();
             agregarEstadisticas();
         }
 
@@ -580,21 +496,26 @@ public class MenuPrincipalView extends JFrame {
         );
     }
 
-    private void agregarCalendario(
-            String nombre) {
+    private void agregarCalendarioRecursos() {
 
         CalendarioRecursosView vista =
                 new CalendarioRecursosView();
 
-        new CalendarioRecursosController(
-                vista
-        );
+        new CalendarioRecursosController(vista);
 
         pestanas.addTab(
-                nombre,
+                "Calendario",
                 iconoTab("▦"),
                 prepararVista(vista)
         );
+    }
+
+    private void agregarCalendarioActividades() {
+        JPanel panel = new JPanel(new BorderLayout());
+        JLabel mensaje = new JLabel("Calendarización de Actividades", SwingConstants.CENTER);
+        mensaje.setFont(new Font("Segoe UI", Font.BOLD, 20));
+        panel.add(mensaje, BorderLayout.CENTER);
+        pestanas.addTab("Actividades", iconoTab("▦"), panel);
     }
 
     private void agregarEstadisticas() {
