@@ -42,12 +42,7 @@ public class RecursosController {
          * de forma transversal a todas las pantallas
          * más adelante.
          */
-        vista.getBtnImprimir()
-                .addActionListener(e ->
-                        vista.mostrarMensaje(
-                                "La generación de reporte en PDF se agregará más adelante."
-                        )
-                );
+        vista.getBtnImprimir().addActionListener(e -> generarPDF());
 
         vista.getTabla()
                 .getSelectionModel()
@@ -170,5 +165,31 @@ public class RecursosController {
 
     private void cargarListado(List<Recurso> recursos) {
         vista.cargarTabla(recursos);
+    }
+
+    private void generarPDF() {
+
+        try {
+
+            java.io.File archivo =
+                    una.sistemareservas.negocio.ReportePDFService
+                            .generarRecursos(
+                                    servicio.listar()
+                            );
+
+            vista.mostrarMensaje(
+                    "PDF generado correctamente:\n"
+                            + archivo.getAbsolutePath()
+            );
+
+            java.awt.Desktop.getDesktop().open(archivo);
+
+        } catch (Exception ex) {
+
+            vista.mostrarError(
+                    "Error al generar PDF: "
+                            + ex.getMessage()
+            );
+        }
     }
 }

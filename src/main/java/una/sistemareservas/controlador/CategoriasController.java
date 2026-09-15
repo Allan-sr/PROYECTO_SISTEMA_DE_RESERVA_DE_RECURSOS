@@ -40,12 +40,7 @@ public class CategoriasController {
          * de forma transversal a todas las pantallas
          * más adelante.
          */
-        vista.getBtnImprimir()
-                .addActionListener(e ->
-                        vista.mostrarMensaje(
-                                "La generación de reporte en PDF se agregará más adelante."
-                        )
-                );
+        vista.getBtnImprimir().addActionListener(e -> generarPDF());
 
         vista.getTabla()
                 .getSelectionModel()
@@ -149,5 +144,15 @@ public class CategoriasController {
 
     private void cargarListado(List<Categoria> categorias) {
         vista.cargarTabla(categorias);
+    }
+
+    private void generarPDF() {
+        try {
+            java.io.File archivo = una.sistemareservas.negocio.ReportePDFService.generarCategorias(servicio.listar());
+            vista.mostrarMensaje("PDF generado correctamente:\n" + archivo.getAbsolutePath());
+            java.awt.Desktop.getDesktop().open(archivo);
+        } catch (Exception ex) {
+            vista.mostrarError("Error al generar PDF: " + ex.getMessage());
+        }
     }
 }

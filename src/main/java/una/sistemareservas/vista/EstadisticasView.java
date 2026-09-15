@@ -14,6 +14,7 @@ public class EstadisticasView extends JFrame {
     private JSpinner spinnerFechaInicio;
     private JSpinner spinnerFechaFin;
     private JButton btnGenerar;
+    private JButton btnPDF;
     private JComboBox<String> comboTipoGrafico;
     private JPanel panelGrafico;
 
@@ -42,13 +43,16 @@ public class EstadisticasView extends JFrame {
 
         panelFiltros.add(new JLabel("Tipo de Reporte:"));
         comboTipoGrafico = new JComboBox<>(new String[]{
-                "Categorías más reservadas (Barras)",
-                "Distribución por Estado de Reserva (Pastel)"
+                "Recursos por categoría",
+                "Actividades por semana"
         });
         panelFiltros.add(comboTipoGrafico);
 
         btnGenerar = new JButton("Generar Gráfico");
         panelFiltros.add(btnGenerar);
+
+        btnPDF = new JButton("Generar PDF");
+        panelFiltros.add(btnPDF);
 
         add(panelFiltros, BorderLayout.NORTH);
 
@@ -91,11 +95,10 @@ public class EstadisticasView extends JFrame {
     public int getTipoGraficoSeleccionado() {
         return comboTipoGrafico.getSelectedIndex();
     }
-
     public JButton getBtnGenerar() {
         return btnGenerar;
     }
-
+    public JButton getBtnPDF() {return btnPDF;}
     public void mostrarMensaje(String msg) {
         JOptionPane.showMessageDialog(this, msg);
     }

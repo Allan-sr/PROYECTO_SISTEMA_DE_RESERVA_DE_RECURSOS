@@ -6,6 +6,12 @@ import una.sistemareservas.modelo.Reserva;
 import una.sistemareservas.negocio.CalendarioRecursosService;
 import una.sistemareservas.vista.CalendarioRecursosView;
 
+import una.sistemareservas.negocio.ReportePDFService;
+
+import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
@@ -31,11 +37,8 @@ public class CalendarioRecursosController {
     }
 
     private void iniciarEventos() {
-
-        vista.getBtnConsultar()
-                .addActionListener(
-                        e -> consultar()
-                );
+        vista.getBtnConsultar().addActionListener(e -> consultar());
+        vista.getBtnPDF().addActionListener(e -> generarPDF());
     }
 
     private void cargarCategorias() {
@@ -255,5 +258,97 @@ public class CalendarioRecursosController {
         modelo.setColumnIdentifiers(
                 new String[]{"Hora"}
         );
+    }
+
+    private void generarPDF() {
+
+        Categoria categoria =
+                vista.getCategoriaSeleccionada();
+
+        if (categoria == null) {
+
+            vista.mostrarMensaje(
+                    "Debe seleccionar una categoría."
+            );
+
+            return;
+        }
+
+        LocalDate fecha =
+                vista.getFechaSeleccionada();
+
+        List<Recurso> recursos =
+                servicio.listarRecursosPorCategoria(
+                        categoria.getId()
+                );
+
+        if (recursos.isEmpty()) {
+
+            vista.mostrarMensaje(
+                    "No existen recursos registrados para esta categoría."
+            );
+
+            return;
+        }
+
+        try {
+
+            Map<String, Reserva> reservasPorRecurso =
+                    new HashMap<>();
+
+            for (Recurso recurso : recursos) {
+
+                for (LocalTime hora :
+                        servicio.obtenerHorasDelDia()) {
+
+                    Reserva reserva =
+                            servicio.obtenerReservaDelRecurso(
+                                    recurso,
+                                    fecha,
+                                    hora
+                            );
+
+                    if (reserva != null) {
+
+                        reservasPorRecurso.put(
+                                recurso.getId(),
+                                reserva
+                        );
+
+                        break;
+                    }
+                }
+            }
+
+            File archivo =
+                    ReportePDFService.generarCalendarioRecursos(
+                            categoria,
+                            fecha,
+                            recursos,
+                            reservasPorRecurso
+                    );
+
+            int opcion =
+                    JOptionPane.showConfirmDialog(
+                            vista,
+                            "PDF generado correctamente.\n"
+                                    + archivo.getAbsolutePath()
+                                    + "\n\n¿Desea abrirlo?",
+                            "Reporte PDF",
+                            JOptionPane.YES_NO_OPTION
+                    );
+
+            if (opcion == JOptionPane.YES_OPTION) {
+
+                Desktop.getDesktop().open(archivo);
+            }
+
+        } catch (Exception ex) {
+
+            vista.mostrarMensaje(
+                    "Error al generar PDF: "
+                            + ex.getMessage()
+            );
+        }
     }
 }

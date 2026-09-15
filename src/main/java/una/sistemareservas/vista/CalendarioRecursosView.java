@@ -15,8 +15,10 @@ public class CalendarioRecursosView extends JFrame {
     private JSpinner spinnerFecha;
     private JComboBox<Categoria> cmbCategoria;
     private JButton btnConsultar;
+    private JButton btnPDF;
     private JTable tablaCalendario;
     private DefaultTableModel modelTabla;
+
 
     public CalendarioRecursosView() {
 
@@ -42,6 +44,9 @@ public class CalendarioRecursosView extends JFrame {
         panelFiltros.add(cmbCategoria);
         btnConsultar = new JButton("Consultar");
         panelFiltros.add(btnConsultar);
+        btnPDF = new JButton("Generar PDF");
+        panelFiltros.add(btnPDF);
+
         add(panelFiltros, BorderLayout.NORTH);
         String[] columnas = {"Hora"};
 
@@ -124,6 +129,8 @@ public class CalendarioRecursosView extends JFrame {
     public JButton getBtnConsultar() {
         return btnConsultar;
     }
+
+    public JButton getBtnPDF() {return btnPDF;}
 
     public JTable getTablaCalendario() {
         return tablaCalendario;

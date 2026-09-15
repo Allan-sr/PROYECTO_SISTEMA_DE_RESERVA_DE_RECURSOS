@@ -177,9 +177,7 @@ public class FuncionariosView extends JFrame {
         return btnBuscar;
     }
 
-    public JButton getBtnImprimir() {
-        return btnImprimir;
-    }
+    public JButton getBtnImprimir() {return btnImprimir;}
 
     public JButton getBtnGuardar() {
         return btnGuardar;

@@ -1,5 +1,8 @@
 package una.sistemareservas.vista;
 
+import una.sistemareservas.controlador.CalendarioActividadesController;
+import una.sistemareservas.vista.CalendarioActividadesView;
+
 import una.sistemareservas.controlador.CalendarioRecursosController;
 import una.sistemareservas.controlador.CategoriasController;
 import una.sistemareservas.controlador.EstadisticasController;
@@ -511,11 +514,17 @@ public class MenuPrincipalView extends JFrame {
     }
 
     private void agregarCalendarioActividades() {
-        JPanel panel = new JPanel(new BorderLayout());
-        JLabel mensaje = new JLabel("Calendarización de Actividades", SwingConstants.CENTER);
-        mensaje.setFont(new Font("Segoe UI", Font.BOLD, 20));
-        panel.add(mensaje, BorderLayout.CENTER);
-        pestanas.addTab("Actividades", iconoTab("▦"), panel);
+
+        CalendarioActividadesView vista =
+                new CalendarioActividadesView();
+
+        new CalendarioActividadesController(vista);
+
+        pestanas.addTab(
+                "Actividades",
+                iconoTab("▦"),
+                prepararVista(vista)
+        );
     }
 
     private void agregarEstadisticas() {

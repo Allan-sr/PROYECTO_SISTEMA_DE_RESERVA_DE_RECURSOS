@@ -4,17 +4,21 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.category.DefaultCategoryDataset;
-import org.jfree.data.general.DefaultPieDataset;
 
+import una.sistemareservas.modelo.EstadoReserva;
 import una.sistemareservas.modelo.Recurso;
 import una.sistemareservas.modelo.Reserva;
-
 import una.sistemareservas.negocio.RecursoService;
+import una.sistemareservas.negocio.ReportePDFService;
 import una.sistemareservas.negocio.ReservaService;
 import una.sistemareservas.vista.EstadisticasView;
 
+import java.awt.Desktop;
+import java.io.File;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.util.HashMap;
+import java.time.format.DateTimeFormatter;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -24,126 +28,292 @@ public class EstadisticasController {
     private final EstadisticasView vista;
     private final ReservaService reservaService;
 
+    private List<Reserva> reservasActuales;
+    private Map<String, Integer> datosActuales;
+
     public EstadisticasController(EstadisticasView vista) {
         this.vista = vista;
         this.reservaService = new ReservaService();
+
         iniciarEventos();
     }
 
     private void iniciarEventos() {
-        vista.getBtnGenerar().addActionListener(e -> generarReporte());
+
+        vista.getBtnGenerar().addActionListener(
+                e -> generarReporte()
+        );
+
+        vista.getBtnPDF().addActionListener(
+                e -> generarPDF()
+        );
     }
 
     private void generarReporte() {
+
         LocalDate inicio = vista.getFechaInicio();
         LocalDate fin = vista.getFechaFin();
 
         if (inicio.isAfter(fin)) {
-            vista.mostrarMensaje("La fecha de inicio no puede ser posterior a la fecha fin.");
+            vista.mostrarMensaje(
+                    "La fecha de inicio no puede ser posterior a la fecha fin."
+            );
             return;
         }
 
-        List<Reserva> todas = reservaService.listar(); // Obtiene todas las reservas guardadas
-
-        // Filtrar reservas por el rango de fechas
-        List<Reserva> filtradas = todas.stream()
-                .filter(r -> r.getFecha() != null &&
-                        !r.getFecha().isBefore(inicio) &&
-                        !r.getFecha().isAfter(fin))
+        reservasActuales = reservaService.listar()
+                .stream()
+                .filter(r ->
+                        r.getEstado() == EstadoReserva.ACTIVA
+                                && r.getFecha() != null
+                                && !r.getFecha().isBefore(inicio)
+                                && !r.getFecha().isAfter(fin)
+                )
                 .collect(Collectors.toList());
 
-        if (filtradas.isEmpty()) {
-            vista.mostrarMensaje("No se encontraron reservas registrados en el rango de fechas seleccionado.");
+        if (reservasActuales.isEmpty()) {
+            vista.mostrarMensaje(
+                    "No se encontraron reservas activas en el período seleccionado."
+            );
+            return;
         }
 
         if (vista.getTipoGraficoSeleccionado() == 0) {
-            generarGraficoCategorias(filtradas);
+
+            datosActuales =
+                    obtenerCategorias(reservasActuales);
+
+            generarGraficoCategorias(datosActuales);
+
         } else {
-            generarGraficoEstados(filtradas);
+
+            datosActuales =
+                    obtenerActividadesPorSemana(reservasActuales);
+
+            generarGraficoActividades(datosActuales);
         }
     }
 
-    private void generarGraficoCategorias(List<Reserva> reservas) {
-        Map<String, Integer> conteoCategorias = new HashMap<>();
-        RecursoService recursoService = new RecursoService();
+    private Map<String, Integer> obtenerCategorias(
+            List<Reserva> reservas) {
 
-        for (Reserva r : reservas) {
-            if (r.getRecursos() != null && !r.getRecursos().isEmpty()) {
-                for (Recurso rec : r.getRecursos()) {
-                    if (rec.getCategoria() != null) {
-                        String catNombre = rec.getCategoria().getDescripcion();
-                        conteoCategorias.put(catNombre, conteoCategorias.getOrDefault(catNombre, 0) + 1);
+        Map<String, Integer> conteo =
+                new LinkedHashMap<>();
+
+        RecursoService recursoService =
+                new RecursoService();
+
+        for (Reserva reserva : reservas) {
+
+            if (reserva.getRecursos() != null
+                    && !reserva.getRecursos().isEmpty()) {
+
+                for (Recurso recurso :
+                        reserva.getRecursos()) {
+
+                    if (recurso.getCategoria() != null) {
+
+                        String categoria =
+                                recurso.getCategoria()
+                                        .getDescripcion();
+
+                        conteo.put(
+                                categoria,
+                                conteo.getOrDefault(
+                                        categoria, 0
+                                ) + 1
+                        );
                     }
                 }
-            } else if (r.getRecursoIds() != null) {
-                for (String idRecurso : r.getRecursoIds()) {
-                    Recurso rec = recursoService.buscarPorId(idRecurso);
-                    if (rec != null && rec.getCategoria() != null) {
-                        String catNombre = rec.getCategoria().getDescripcion();
-                        conteoCategorias.put(catNombre, conteoCategorias.getOrDefault(catNombre, 0) + 1);
+
+            } else if (reserva.getRecursoIds() != null) {
+
+                for (String id :
+                        reserva.getRecursoIds()) {
+
+                    Recurso recurso =
+                            recursoService.buscarPorId(id);
+
+                    if (recurso != null
+                            && recurso.getCategoria() != null) {
+
+                        String categoria =
+                                recurso.getCategoria()
+                                        .getDescripcion();
+
+                        conteo.put(
+                                categoria,
+                                conteo.getOrDefault(
+                                        categoria, 0
+                                ) + 1
+                        );
                     }
                 }
             }
         }
 
-        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-        conteoCategorias.forEach((categoria, cantidad) -> {
-            dataset.addValue(cantidad, "Solicitudes", categoria);
-        });
+        return conteo;
+    }
 
-        JFreeChart chart = ChartFactory.createBarChart(
-                "Categorías de Recursos Más Solicitadas",
-                "Categoría",
-                "Cantidad de Solicitudes",
-                dataset,
-                PlotOrientation.VERTICAL,
-                false, true, false
+    private Map<String, Integer> obtenerActividadesPorSemana(
+            List<Reserva> reservas) {
+
+        Map<String, Integer> conteo =
+                new LinkedHashMap<>();
+
+        DateTimeFormatter formato =
+                DateTimeFormatter.ofPattern("dd/MM");
+
+        for (Reserva reserva : reservas) {
+
+            LocalDate lunes =
+                    reserva.getFecha()
+                            .with(DayOfWeek.MONDAY);
+
+            LocalDate domingo =
+                    lunes.plusDays(6);
+
+            String semana =
+                    lunes.format(formato)
+                            + " - "
+                            + domingo.format(formato);
+
+            conteo.put(
+                    semana,
+                    conteo.getOrDefault(semana, 0) + 1
+            );
+        }
+
+        return conteo;
+    }
+
+    private void generarGraficoCategorias(
+            Map<String, Integer> datos) {
+
+        DefaultCategoryDataset dataset =
+                new DefaultCategoryDataset();
+
+        datos.forEach(
+                (categoria, cantidad) ->
+                        dataset.addValue(
+                                cantidad,
+                                "Recursos",
+                                categoria
+                        )
         );
 
-        // Personalización Estética del Gráfico
-        chart.setBackgroundPaint(java.awt.Color.WHITE);
-        org.jfree.chart.plot.CategoryPlot plot = chart.getCategoryPlot();
-        plot.setBackgroundPaint(new java.awt.Color(245, 247, 250));
-        plot.setDomainGridlinePaint(java.awt.Color.WHITE);
-        plot.setRangeGridlinePaint(new java.awt.Color(220, 224, 230));
+        JFreeChart chart =
+                ChartFactory.createBarChart(
+                        "Recursos Reservados por Categoría",
+                        "Categoría",
+                        "Cantidad",
+                        dataset,
+                        PlotOrientation.VERTICAL,
+                        false,
+                        true,
+                        false
+                );
 
-        // Forzar el eje Y a mostrar solo números enteros (1, 2, 3...)
-        org.jfree.chart.axis.NumberAxis rangeAxis = (org.jfree.chart.axis.NumberAxis) plot.getRangeAxis();
-        rangeAxis.setStandardTickUnits(org.jfree.chart.axis.NumberAxis.createIntegerTickUnits());
-        rangeAxis.setLowerBound(0); // Evita valores negativos
-
-        // Ajustar el color y ancho de las barras
-        org.jfree.chart.renderer.category.BarRenderer renderer = (org.jfree.chart.renderer.category.BarRenderer) plot.getRenderer();
-        renderer.setSeriesPaint(0, new java.awt.Color(41, 128, 185)); // Azul corporativo
-        renderer.setMaximumBarWidth(0.15); // Evita que una sola barra ocupe toda la pantalla
+        chart.setBackgroundPaint(
+                java.awt.Color.WHITE
+        );
 
         vista.mostrarGrafico(chart);
     }
 
-    private void generarGraficoEstados(List<Reserva> reservas) {
-        Map<String, Integer> conteoEstados = new HashMap<>();
+    private void generarGraficoActividades(
+            Map<String, Integer> datos) {
 
-        for (Reserva r : reservas) {
-            String estado = (r.getEstado() != null) ? r.getEstado().toString() : "DESCONOCIDO";
-            conteoEstados.put(estado, conteoEstados.getOrDefault(estado, 0) + 1);
-        }
+        DefaultCategoryDataset dataset =
+                new DefaultCategoryDataset();
 
-        DefaultPieDataset<String> dataset = new DefaultPieDataset<>();
-        conteoEstados.forEach(dataset::setValue);
-
-        JFreeChart chart = ChartFactory.createPieChart(
-                "Distribución de Reservas por Estado",
-                dataset,
-                true, true, false
+        datos.forEach(
+                (semana, cantidad) ->
+                        dataset.addValue(
+                                cantidad,
+                                "Actividades",
+                                semana
+                        )
         );
 
-        // Personalización Estética del Pastel
-        chart.setBackgroundPaint(java.awt.Color.WHITE);
-        org.jfree.chart.plot.PiePlot<?> plot = (org.jfree.chart.plot.PiePlot<?>) chart.getPlot();
-        plot.setBackgroundPaint(new java.awt.Color(245, 247, 250));
-        plot.setSectionPaint("ACTIVA", new java.awt.Color(46, 204, 113));    // Verde
-        plot.setSectionPaint("CANCELADA", new java.awt.Color(231, 76, 60)); // Rojo
+        JFreeChart chart =
+                ChartFactory.createBarChart(
+                        "Actividades Programadas por Semana",
+                        "Semana",
+                        "Cantidad de Actividades",
+                        dataset,
+                        PlotOrientation.VERTICAL,
+                        false,
+                        true,
+                        false
+                );
+
+        chart.setBackgroundPaint(
+                java.awt.Color.WHITE
+        );
 
         vista.mostrarGrafico(chart);
+    }
+
+    private void generarPDF() {
+
+        if (reservasActuales == null
+                || reservasActuales.isEmpty()) {
+
+            vista.mostrarMensaje(
+                    "Primero debe generar una estadística."
+            );
+
+            return;
+        }
+
+        try {
+
+            File archivo;
+
+            if (vista.getTipoGraficoSeleccionado() == 0) {
+
+                archivo =
+                        ReportePDFService
+                                .generarEstadisticasCategorias(
+                                        vista.getFechaInicio(),
+                                        vista.getFechaFin(),
+                                        datosActuales
+                                );
+
+            } else {
+
+                archivo =
+                        ReportePDFService
+                                .generarEstadisticasActividades(
+                                        vista.getFechaInicio(),
+                                        vista.getFechaFin(),
+                                        datosActuales
+                                );
+            }
+
+            int opcion =
+                    javax.swing.JOptionPane.showConfirmDialog(
+                            null,
+                            "PDF generado correctamente.\n"
+                                    + archivo.getAbsolutePath()
+                                    + "\n\n¿Desea abrirlo?",
+                            "Reporte PDF",
+                            javax.swing.JOptionPane.YES_NO_OPTION
+                    );
+
+            if (opcion ==
+                    javax.swing.JOptionPane.YES_OPTION) {
+
+                Desktop.getDesktop().open(archivo);
+            }
+
+        } catch (Exception ex) {
+
+            vista.mostrarMensaje(
+                    "Error al generar PDF: "
+                            + ex.getMessage()
+            );
+        }
     }
 }

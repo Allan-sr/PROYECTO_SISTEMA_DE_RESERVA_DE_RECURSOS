@@ -1,5 +1,6 @@
 package una.sistemareservas.controlador;
 
+import java.io.File;
 import una.sistemareservas.modelo.Funcionario;
 import una.sistemareservas.negocio.FuncionarioService;
 import una.sistemareservas.vista.FuncionariosView;
@@ -40,12 +41,7 @@ public class FuncionariosController {
          * de forma transversal a todas las pantallas
          * más adelante.
          */
-        vista.getBtnImprimir()
-                .addActionListener(e ->
-                        vista.mostrarMensaje(
-                                "La generación de reporte en PDF se agregará más adelante."
-                        )
-                );
+        vista.getBtnImprimir().addActionListener(e -> generarPDF());
 
         vista.getTabla()
                 .getSelectionModel()
@@ -164,5 +160,18 @@ public class FuncionariosController {
 
     private void cargarListado(List<Funcionario> funcionarios) {
         vista.cargarTabla(funcionarios);
+    }
+
+    private void generarPDF() {
+
+        try {
+
+            File archivo = una.sistemareservas.negocio.ReportePDFService.generarFuncionarios(servicio.listar());
+            vista.mostrarMensaje("PDF generado correctamente:\n" + archivo.getAbsolutePath());
+            java.awt.Desktop.getDesktop().open(archivo);
+        } catch (Exception ex) {
+            vista.mostrarError("Error al generar PDF: " + ex.getMessage()
+            );
+        }
     }
 }
